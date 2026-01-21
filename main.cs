@@ -7,7 +7,6 @@ using HarmonyLib;
 using static MenuSkipper.MenuSkipper;
 using static MenuSkipper.SharedState;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -83,6 +82,7 @@ namespace MenuSkipper
             warningObj?.SetActive(false);
         }
     }
+
     public static class UIDebugHelper
     {
         public static void DumpAllUIElements()
