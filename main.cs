@@ -68,9 +68,8 @@ namespace MenuSkipper
         [HarmonyPrefix]
         public static bool PreRunScript_TryLore_MyPatches(PreRunScript __instance)
         {
-            //AccessTools.Field(typeof(PreRunScript), "didIntro").SetValue(__instance, false);
-            //return false;
-            return true;
+            AccessTools.Field(typeof(PreRunScript), "didIntro").SetValue(__instance, true);
+            return false;
         }
 
         [HarmonyPatch(typeof(PreRunScript))]
@@ -80,98 +79,6 @@ namespace MenuSkipper
         {
             var warningObj = GameObject.Find("Warning");
             warningObj?.SetActive(false);
-        }
-    }
-
-    public static class UIDebugHelper
-    {
-        public static void DumpAllUIElements()
-        {
-            var allGameObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
-            StringBuilder sb = new StringBuilder();
-
-            foreach (var go in allGameObjects)
-            {
-                // Check if this GameObject has a Canvas or any UI-related components
-                var canvas = go.GetComponent<Canvas>();
-                var button = go.GetComponent<Button>();
-                var eventTrigger = go.GetComponent<EventTrigger>();
-
-                if (canvas || button || eventTrigger)
-                {
-                    sb.AppendLine($"GameObject: {go.name}");
-
-                    if (canvas != null)
-                        sb.AppendLine("  - Has Canvas");
-
-                    if (button != null)
-                    {
-                        sb.AppendLine("  - Has Button");
-                        DumpUnityEvent(sb, "    OnClick", button.onClick);
-                    }
-
-                    if (eventTrigger != null)
-                    {
-                        sb.AppendLine("  - Has EventTrigger");
-                        foreach (var entry in eventTrigger.triggers)
-                        {
-                            sb.AppendLine($"    - Event: {entry.eventID}");
-                            DumpUnityEvent(sb, "      Callbacks", entry.callback);
-                        }
-                    }
-
-                    // You can add other UI components and their events here as needed
-                }
-            }
-
-            Debug.Log(sb.ToString());
-        }
-
-        private static void DumpUnityEvent(StringBuilder sb, string label, UnityEngine.Events.UnityEventBase unityEvent)
-        {
-            if (unityEvent == null)
-            {
-                sb.AppendLine($"{label}: null");
-                return;
-            }
-
-            try
-            {
-                // Use reflection to get persistent event count safely
-                var getCountMethod = unityEvent.GetType().GetMethod("GetPersistentEventCount", BindingFlags.Instance | BindingFlags.Public);
-                if (getCountMethod == null)
-                {
-                    sb.AppendLine($"{label}: Unable to get event count");
-                    return;
-                }
-
-                int count = (int)getCountMethod.Invoke(unityEvent, null);
-                sb.AppendLine($"{label}: {count} persistent listeners");
-
-                var getTargetMethod = unityEvent.GetType().GetMethod("GetPersistentTarget", BindingFlags.Instance | BindingFlags.Public);
-                var getMethodNameMethod = unityEvent.GetType().GetMethod("GetPersistentMethodName", BindingFlags.Instance | BindingFlags.Public);
-
-                if (getTargetMethod == null || getMethodNameMethod == null)
-                {
-                    sb.AppendLine($"{label}: Unable to get listeners' targets or method names");
-                    return;
-                }
-
-                for (int i = 0; i < count; i++)
-                {
-                    var target = getTargetMethod.Invoke(unityEvent, new object[] { i });
-                    var methodName = getMethodNameMethod.Invoke(unityEvent, new object[] { i }) as string;
-
-                    string targetName = target != null ? target.ToString() : "null";
-                    methodName = methodName ?? "null";
-
-                    sb.AppendLine($"      Listener {i}: Target={targetName}, Method={methodName}");
-                }
-            }
-            catch (Exception ex)
-            {
-                sb.AppendLine($"{label}: Exception during reflection: {ex.Message}");
-            }
         }
     }
 }
