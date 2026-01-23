@@ -29,7 +29,7 @@ namespace MenuSkipper
         public static ManualLogSource logger;
         public const string pluginGuid = "shushu.casualtiesunknown.menuskipper";
         public const string pluginName = "Menu Skipper";
-        public const string pluginVersion = "1.12.25";
+        public const string pluginVersion = "26.1.2.0";
 
         public static MenuSkipper Instance;
 
